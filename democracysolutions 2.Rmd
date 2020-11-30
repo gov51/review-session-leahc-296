@@ -42,7 +42,18 @@ Name                 Description
 
 ```{r, message=FALSE, warning=FALSE}
 
+wb <- read.csv("data/world_bank.csv")
+polity <- read.csv("data/polity.csv")
 
+polity <- subset(polity, 
+                 subset = (year >= 1970 & year <= 2015),
+                 select = c("scode", "year", "polity"))
+
+##rename
+colnames(polity) <- c("country_code", "year", "polity")
+
+##merge
+wb_polity <- merge(wb, polity, by = c("country_code", "year"))
 
 ```
 
@@ -50,6 +61,9 @@ The distribution is right-skewed. A good idea is to take the logarithm.
 
 ```{r, message=FALSE, warning=FALSE}
 
+hist(wb_polity$inf_mort), xlab = "Log of Infrant Mortality (deaths per 1000 children under 5)", col = "steelblue2", main = "Histogram of Infant Mortality", ylim = c(0,800))
+
+hist(wb_polity$inf_mort), xlab
 
 ```
 
@@ -65,7 +79,7 @@ We can visualize the bivariate relationship between these variables.
 
 ```{r, message=FALSE, warning=FALSE}
 
-
+plot(wb_polity$polity, log(wb_polity$inf_mort))
 
 
 
@@ -90,6 +104,13 @@ Interpret the coefficients of `polity`. Note that if `log(inf_mort)` increases i
 
 ```{r}
 
+model1 <- lm(log(inf_mort) ~ polity, data = wb_polity)
+model2 <- lm(log(inf_mort) ~ polity + log(pop_density) + log(gdp_per_capita) + gdp_growth, data = wb_polity)
+
+summary(model1)
+summary(model2)
+
+
 
 ```
 
@@ -107,6 +128,13 @@ Interpret the coefficient of `polity`.
 ## Answer 2
 
 ```{r}
+
+model3 <- lm(log(inf_mort) ~ polity + log(pop_density) + 
+               log(gdp_per_capita) + gdp_growth + 
+               country_name + factor(year),
+             data = wb_polity)
+
+summary(model3)
 
 
 ```
