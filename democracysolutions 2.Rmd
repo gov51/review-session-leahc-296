@@ -110,7 +110,7 @@ model2 <- lm(log(inf_mort) ~ polity + log(pop_density) + log(gdp_per_capita) + g
 summary(model1)
 summary(model2)
 
-
+install.packages(“modelsummary”)
 
 ```
 
@@ -154,6 +154,16 @@ What can we conclude about the effect of democratization on infant mortality?
 
 ```{r}
 
+conf_intervals <- rbind(
+  confint(model1)["polity",],
+  confint(model2)["polity",],
+  confint(model3)["polity",]
+)
+
+conf_intervals
+
+
+
 
 ```
 
@@ -166,6 +176,23 @@ Using `modelsummary` create a nicely formatted table showing the coefficients fr
 
 ```{r}
 
+coefs <- c(
+  "polity" = "Polity score",
+  "log(pop_density)" = "population density (logged)",
+  "log(gdp_per_capita)" = "GDP per capita (logged)",
+  "gdp_growth" = "GDP growth"
+)
+
+
+modelsummary::modelsummary(
+  list("Bivariate" = model1,
+       "Controls" = model2,
+       "Country and Year FEs" = model3),
+  title = "Dep var",
+  gof_omit = "AIC|BIC|Log.Lik.IF",
+  coef_map = coefs,
+  stars = TRUE
+)
 
 ```
 
